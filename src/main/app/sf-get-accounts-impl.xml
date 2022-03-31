@@ -13,13 +13,13 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 	<objectstore:config name="ObjectStore__Connector" persistent="true" doc:name="ObjectStore: Connector"/>
 	<flow name="sf-get-accounts-implFlow" processingStrategy="synchronous">
 		<sfdc:query config-ref="Salesforce__Basic_Authentication" query="dsql:SELECT AccountNumber,AccountSource,Active__c,AnnualRevenue,BillingCity,BillingCountry,BillingGeocodeAccuracy,LastModifiedDate FROM Account" doc:name="Salesforce"/>
-		<json:object-to-json-transformer doc:name="Object to JSON"/>
+		<json:object-to-json-transformer doc:name="Object to JSON - json payload"/>
 		<logger message="log salesforce account payload: #[payload]" level="INFO" doc:name="Logger - salesforce account payload"/>
 	</flow>
 	<flow name="sf-get-accounts-implFlow1" processingStrategy="synchronous">
 		<poll doc:name="Poll">
 			<fixed-frequency-scheduler frequency="10" timeUnit="SECONDS"/>
-			<logger message="poll started" level="INFO" doc:name="Logger"/>
+			<logger message="poll started" level="INFO" doc:name="Logger - poll started"/>
 		</poll>
 		<flow-ref name="sf-get-accounts-implFlow" doc:name="Flow Reference - sf-get-accounts-implFlow"/>
 		<logger message="log before object store: #[payload]" level="INFO" doc:name="Logger - before object store"/>
