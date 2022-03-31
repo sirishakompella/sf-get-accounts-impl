@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:objectstore="http://www.mulesoft.org/schema/mule/objectstore" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/objectstore http://www.mulesoft.org/schema/mule/objectstore/current/mule-objectstore.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<sfdc:cached-basic-config name="Salesforce__Basic_Authentication" username="skompella@open-logix.com" password="Karolina#1" securityToken="hjoSC3FT5W1KsCXnDihrABNJ" doc:name="Salesforce: Basic Authentication"/>
+	<objectstore:config name="ObjectStore__Connector" persistent="true" doc:name="ObjectStore: Connector"/>
+	<flow name="sf-get-accounts-implFlow" processingStrategy="synchronous">
+		<sfdc:query config-ref="Salesforce__Basic_Authentication" query="dsql:SELECT AccountNumber,AccountSource,Active__c,AnnualRevenue,BillingCity,BillingCountry,BillingGeocodeAccuracy,LastModifiedDate FROM Account" doc:name="Salesforce"/>
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+		<logger message="log salesforce account payload: #[payload]" level="INFO" doc:name="Logger - salesforce account payload"/>
+	</flow>
+	<flow name="sf-get-accounts-implFlow1" processingStrategy="synchronous">
+		<poll doc:name="Poll">
+			<fixed-frequency-scheduler frequency="10" timeUnit="SECONDS"/>
+			<logger message="poll started" level="INFO" doc:name="Logger"/>
+		</poll>
+		<flow-ref name="sf-get-accounts-implFlow" doc:name="Flow Reference - sf-get-accounts-implFlow"/>
+		<logger message="log before object store: #[payload]" level="INFO" doc:name="Logger - before object store"/>
+		<objectstore:store config-ref="ObjectStore__Connector" key="message" value-ref="#[payload]" overwrite="true" doc:name="ObjectStore - store Accounts"/>
+		<logger message="log after object store: #[payload]" level="INFO" doc:name="Logger - after object store"/>
+	</flow>
+</mule>
