@@ -16,26 +16,25 @@ http://www.mulesoft.org/schema/mule/mock http://www.mulesoft.org/schema/mule/moc
             <mock:then-return payload="#['1' ]" encoding="UTF-8" mimeType="application/json"/>
         </mock:when>
         <flow-ref name="sf-get-accounts-implFlow" doc:name="Flow-ref to sf-get-accounts-implFlow"/>
-        <mock:verify-call messageProcessor=".*:.*" doc:name="Verify Call" atLeast="1">
+        <mock:verify-call messageProcessor=".*:.*" doc:name="Verify Call - salesforce account object" atLeast="1">
 			<mock:with-attributes>
 				<mock:with-attribute name="doc:name" whereValue="#['Salesforce - select']"/>
 			</mock:with-attributes>
         </mock:verify-call>
+		<mock:verify-call messageProcessor=".*:.*" atLeast="1" doc:name="Verify Call - json payload">
+			<mock:with-attributes>
+				<mock:with-attribute name="doc:name" whereValue="#['Object to JSON - json payload']"/>
+			</mock:with-attributes>
+		</mock:verify-call>
+		<munit:assert-not-null message="Accounts payload is null" doc:name="Assert Not Null Payload - json payload"/>
     </munit:test>
     <munit:test name="sf-get-accounts-impl-test-suite-sf-get-accounts-implFlow1Test" description="Test">
-		<mock:when messageProcessor=".*:.*" doc:name="Mock">
-			<mock:with-attributes>
-				<mock:with-attribute name="doc:name" whereValue="#['ObjectStore - store Accounts']"/>
-				<mock:with-attribute name="name" whereValue="sf-get-accounts-implFlow1"/>
-			</mock:with-attributes>
-			<mock:then-return payload="#['1']"/>
-		</mock:when>
         <flow-ref name="sf-get-accounts-implFlow1" doc:name="Flow-ref to sf-get-accounts-implFlow1"/>
-		<mock:verify-call messageProcessor=".*:.*" atLeast="1" doc:name="Verify Call">
+		<mock:verify-call messageProcessor=".*:.*" atLeast="1" doc:name="Verify Call - store Accounts">
 			<mock:with-attributes>
 				<mock:with-attribute name="doc:name" whereValue="#['ObjectStore - store Accounts']"/>
 			</mock:with-attributes>
 		</mock:verify-call>
-		<munit:assert-not-null message="payload is null" doc:name="Assert Not Null Payload"/>
+		<munit:assert-not-null message="payload is null" doc:name="Assert Not Null Payload - store Accounts"/>
     </munit:test>
 </mule>
